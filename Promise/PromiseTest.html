@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function job1(){
+            console.log('hello')
+
+            return new Promise(function(resolve, reject){ //
+                setTimeout(function(){
+                    // resolve('resolved ok!');
+                    reject('job1 failed'); // 에러가 나여 app이 종료된다
+                }, 2000);
+            });
+        }
+
+        function job2(){
+            console.log('hello2')
+
+            return new Promise(function(resolve, reject){ //
+                setTimeout(function(){
+                    resolve('resolved2 ok!');
+                }, 2000);
+            });
+        }
+
+        // job1().then(function(data){  // NESTED PROMISE
+        //     console.log('data', data);
+        //     job2().then(function(data){
+        //         console.log('data2',data);
+        //     })
+        // })
+
+        job1()
+            .then(function(data){  // CHANING PROMISE
+            console.log('data', data);
+            return job2(); // job1 실행 후 job2() 실행
+            })
+            .catch(function(reason){ // catch 문이 있을 경우 에러가 나오며 실행된다. reason은 에러 사유 메세지
+                console.log('reason', reason);
+                return Promise.reject(reason); // 에러가 나며 실행 종료된다
+            })
+            .then(function(data){
+                console.log('data2',data);
+            })
+
+
+        function timer(time){
+            return new Promise(function(resolve,reject){
+                setTimeout(function(){
+                    resolve(time);
+                }, time)
+            })
+        }
+
+        // async & await
+        async function run(){
+            console.time('timer1');
+            console.time('timer2');
+            console.time('timer3');
+            console.log('start');
+            var time = await timer(1000);
+            console.timeEnd('timer1'); // 1005.19091796875 ms
+            console.log('time'+time);
+            time = await timer(time+1000); 
+            console.timeEnd('timer2'); //3014.17822265625 ms
+            console.log('time'+time);
+            time = await timer(time+1000); 
+            console.timeEnd('timer3'); // 6019.941162109375 ms
+            console.log('time'+time);
+            console.log('end');
+        }
+        console.log('parent start');
+        console.time('parent end');
+        run().then(function(){
+            console.log('parent end');
+        })
+        // console.log('parent end');
+        // console.timeEnd('parent end'); // 0.2041015625 ms
+        
+
+
+
+
+        // Promise.all() 모든 작업이 끝난후 후속작업 시작
+        
+        console.time('Promise.all')
+        Promise.all([timer(1000), timer(2000), timer(3000)]).then(function(result){
+            console.log('result', result); //  [1000, 2000, 3000]
+            console.timeEnd('Promise.all') // 3014.891845703125 ms
+        })
+        // Promise.race() 가장 먼저 끝난 작업 종료 후 다른 작업은 버리고 후속작업 시작
+        console.time('Promise.race')
+        Promise.race([timer(1000), timer(2000), timer(3000)]).then(function(result){
+            console.log('result', result); // 1000
+            console.timeEnd('Promise.race') // 1003.18310546875 ms
+        })
+
+    </script>
+</head>
+<body>
+    hello
+</body>
+</html>
