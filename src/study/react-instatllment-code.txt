@@ -1,6 +1,10 @@
 download node.js
 npm install -g tar@latest // update tar(to solve 'deprecated tar version')
-npm install -g create-react-app // install create-react-app setting
-cd 'targetFolderRoute'
-create-react-app . // install cretae-react-app in current folder
+
+npm install create-react-app // install create-react-app setting
+npm install create-react-app [folderName]. // install cretae-react-app
+cd [folderName]
 npm start // start react app
+
+
+npm list -g / npm list 설치 도듈 조회
